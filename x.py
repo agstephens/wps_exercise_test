@@ -47,6 +47,7 @@ def get_years(dataset):
 
     else:
         for file in dataset:
+            print(f'Working on: {file}')
             with xr.open_dataset(file, autoclose=True) as ds:
                 year = _get_first_year(ds)
                 print(year)

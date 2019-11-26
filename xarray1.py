@@ -4,7 +4,7 @@ import time
 import os
 import cftime
 from pathlib import Path
-
+import sys
 
 start_time = time.time()
 max_lon, min_lon, max_lat, min_lat = 120, 80, 60, -60
@@ -12,7 +12,11 @@ max_lon, min_lon, max_lat, min_lat = 120, 80, 60, -60
 # one_file = 'tas_Amon_HadGEM2-ES_rcp45_r1i1p1_203012-205511.nc'
 files_path = 'badc/cmip5/data/cmip5/output1/MOHC/HadCM3/rcp45/mon/atmos/Amon/r1i1p1/latest/tas'
 absolute_path = os.path.join(str(Path.home()), files_path)
-files = glob.glob(absolute_path + '/*.nc')
+#files = glob.glob(absolute_path + '/*.nc')
+
+files = sys.argv[1:]
+
+print(f'Working on {len(files)} files')
 # #
 # d1 = cftime.Datetime360Day(2010, 1, 1)
 # d2 = cftime.Datetime360Day(2020, 1, 1)
