@@ -1,38 +1,42 @@
-from x import get_years, couple_subset, open_mfdatasets
+import xarray as xr
 import glob
 import time
-import os
-import cftime
-from pathlib import Path
 import sys
 
-start_time = time.time()
-max_lon, min_lon, max_lat, min_lat = 120, 80, 60, -60
+base_path = '/badc/cmip5/data/cmip5/output1/MOHC/HadCM3/rcp45/mon/atmos/Amon/r1i1p1/latest/tas'
+files = glob.glob(base_path + '/*.nc')
 
-# one_file = 'tas_Amon_HadGEM2-ES_rcp45_r1i1p1_203012-205511.nc'
-files_path = 'badc/cmip5/data/cmip5/output1/MOHC/HadCM3/rcp45/mon/atmos/Amon/r1i1p1/latest/tas'
-absolute_path = os.path.join(str(Path.home()), files_path)
-#files = glob.glob(absolute_path + '/*.nc')
 
-files = sys.argv[1:]
+REQ_YEARS = set([int(_) for _ in range(2010, 2020)])
 
-print(f'Working on {len(files)} files')
-# #
-# d1 = cftime.Datetime360Day(2010, 1, 1)
-# d2 = cftime.Datetime360Day(2020, 1, 1)
+
+def test_files(fpaths):
+    start_time = time.time()
+    print(f'[INFO] Testing {len(files)} files...')
+
+    files_in_range = []
+
+    for fpath in fpaths:
+        ds = xr.open_dataset(fpath)
+        years = set([int(_) for _ in ds.time.dt.year])
+
+        if REQ_YEARS.issubset(years):
+            files_in_range.append(fpath) 
+        
+    try:
+        xr.open_mfdataset(files_in_range)
+    except Exception as err:
+            print(f'[ERROR] Could not load files: {files_in_range}')
+         
+    print(f'[INFO] Ready to load: {files_in_range}')
+    print(f'took {time.time() - start_time} seconds')
 
 
 if __name__=='__main__':
-    print(get_years(files))
 
-    # files_to_open = couple_subset(files)
-    # new_dataset = open_mfdatasets(files_to_open)
-    #
-    # x = new_dataset['tas'].sel(time=slice(d1, d2), lon=slice(min_lon, max_lon), lat=slice(min_lat, max_lat))
-    # # calculate temporal average across the time axis only
-    # mean_array = x.mean(dim='time')
-    # for i in mean_array:
-    #     print(i)
-
-    print(f'took {time.time() - start_time} seconds')
+    args = sys.argv[1:]
+    if len(args) > 0:
+        files = args
+ 
+    test_files(fpaths=files)
 
