@@ -25,10 +25,12 @@ def test_files(fpaths):
         
     try:
         xr.open_mfdataset(files_in_range)
+        valid = files_in_range
+        print(f'[INFO] Ready to load: {files_in_range}')
     except Exception as err:
-            print(f'[ERROR] Could not load files: {files_in_range}')
-         
-    print(f'[INFO] Ready to load: {files_in_range}')
+        print(f'[ERROR] Could not load files: {files_in_range}')
+        valid = []
+
     print(f'took {time.time() - start_time} seconds')
 
 
